@@ -5,6 +5,8 @@ const { db, DBconnection } = require("./db/database")
 const UserTable = require("./models/LoginModel");
 const SignupRoute = require("./routes/SignupRoute");
 const LoginRoute = require("./routes/LoginRoute");
+const { verifyToken } = require("./services/JwtAuth");
+const ChatRoute = require("./routes/ChatRoute")
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));  
@@ -13,12 +15,15 @@ UserTable();
 
 
 app.use(SignupRoute);
-app.use(LoginRoute)
+app.use(LoginRoute);
+app.use(ChatRoute);
 
 app.use((req, res, next) => {
   console.log(req.url, req.method);
   next();
 });
+
+app.use("/admin",verifyToken);
 
 const POST = 4000;
 app.listen(POST, async () => {

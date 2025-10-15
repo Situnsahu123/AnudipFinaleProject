@@ -8,7 +8,7 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const navigate = useNavigate(); // Initialize navigate
+    const navigate = useNavigate(); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,13 +19,13 @@ export default function Login() {
             console.log("Login successful:", res.data);
             localStorage.setItem('token',res.data.token);
             localStorage.setItem('email', email);
-            navigate('/home');
+            navigate('/');
         } catch (err) {
-            // Use the specific error message from the backend response
+          
             if (err.response && err.response.data && err.response.data.error) {
                 setError(err.response.data.error);
             } else {
-                // Fallback for network errors or other issues
+              
                 setError("An unexpected error occurred. Please try again.");
             }
         } finally {
@@ -81,7 +81,7 @@ export default function Login() {
                     </div>
 
                     <div className="flex items-center justify-between">
-                        <Link to="/forgot-password" className="text-sm text-teal-600 hover:underline">Forgot password?</Link>
+                        <Link to="/forgotpassword" className="text-sm text-teal-600 hover:underline">Forgot password?</Link>
                     </div>
 
                     <button
@@ -94,9 +94,10 @@ export default function Login() {
                 </form>
 
                 <p className="mt-6 text-center text-sm text-gray-600">
-                    Don't have an account?{" "}
+                    Don't have an account?
                     <Link to="/signup" className="text-teal-600 font-semibold hover:underline">Create one</Link>
                 </p>
+        
             </div>
         </div>
     );

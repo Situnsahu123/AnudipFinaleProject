@@ -7,52 +7,78 @@ exports.logroutre = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const [rows] = await db.execute("SELECT * FROM UserTable WHERE email = ?", [
-      email,
-    ]);
-
-    if (rows.length > 0) {
-      const user = rows[0];
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (isMatch) {
-        res
-          .status(200)
-          .json({
-            message: "User logged in successfully!",
-            user: { id: user.id, name: user.name, email: user.email },
-          });
-      } else {
-        res.status(401).json({ error: "Invalid email or password." });
-      }
-    } else {
-      res.status(401).json({ error: "Invalid email or password." });
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required." });
     }
-  } catch (error) {
-    res.status(500).json({ error: "Login failed.", details: error.message });
-  }
 
-  const token = jwt.sign(
-    {email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" }
-  );
+    const [rows] = await db.execute("SELECT * FROM UserTable WHERE email = ?", [email]);
 
-  res.status(200).json({
+    if (rows.length === 0) {
+      return res.status(401).json({ error: "Invalid email or password." });
+    }
+
+    const user = rows[0];
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Invalid email or password." });
+    }
+    const token = jwt.sign(
+      { email: user.email },
+      process.env.JWT_SECRET, 
+      { expiresIn: "1h" }
+    );
+
+    return res.status(200).json({
       message: "User logged in successfully!",
-      user: {email: user.email },
+      user: {
+        name: user.name,
+        email: user.email,
+      },
       token,
     });
-
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({ error: "Login failed.", details: error.message });
+  }
 };
 
-exports.verifyToken = (req, res, next) => {
-  const token = req.headers["authorization"];
-  if (!token) return res.status(403).json({ message: "No token provided" });
+exports.getAllUsers = async (req, res) =>{
+  try {
+    const [rows] = await db.execute("SELECT name, email FROM UserTable");
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: "Failed to fetch users.", details: error.message });
+  }
+}
 
-  jwt.verify(token,process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ message: "Invalid token" });
-    req.user = decoded;
-    next();
-  });
+exports.updatePasswordByEmail = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res.status(400).json({ message: 'Email and new password are required' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password in the database
+    const [result] = await db.execute(
+      'UPDATE UserTable SET password = ? WHERE email = ?',
+      [hashedPassword, email]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  }  catch (error) {
+     console.error('Update Password Error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };
+
+
+
