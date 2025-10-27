@@ -8,7 +8,7 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,15 +17,16 @@ export default function Login() {
         try {
             const res = await axios.post('http://localhost:4000/login', { email, password });
             console.log("Login successful:", res.data);
-            localStorage.setItem('token',res.data.token);
-            localStorage.setItem('email', email);
-            navigate('/');
+            sessionStorage.setItem('token', res.data.token);
+            sessionStorage.setItem('email', email);
+
+            navigate('/home');
         } catch (err) {
-          
+
             if (err.response && err.response.data && err.response.data.error) {
                 setError(err.response.data.error);
             } else {
-              
+
                 setError("An unexpected error occurred. Please try again.");
             }
         } finally {
@@ -97,7 +98,7 @@ export default function Login() {
                     Don't have an account?
                     <Link to="/signup" className="text-teal-600 font-semibold hover:underline">Create one</Link>
                 </p>
-        
+
             </div>
         </div>
     );

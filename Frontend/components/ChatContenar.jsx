@@ -8,17 +8,15 @@ const ChatContenar = () => {
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
 
-  // Logged-in user's email
-  const userEmail = localStorage.getItem("email");
-  // Receiver (depends on your app – doctor or user)
+
+  const userEmail = sessionStorage.getItem("email");
+
   const receiverEmail = selectedDoctor?.email || selectedUser?.email;
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Fetch chat messages between two emails
   useEffect(() => {
     if (!userEmail || !receiverEmail) return;
 
@@ -34,11 +32,10 @@ const ChatContenar = () => {
     };
 
     fetchMessages();
-    const interval = setInterval(fetchMessages, 2000); // auto-refresh
+    const interval = setInterval(fetchMessages, 2000);
     return () => clearInterval(interval);
   }, [userEmail, receiverEmail]);
 
-  // Send a message
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
     if (!userEmail || !receiverEmail) {
@@ -81,8 +78,8 @@ const ChatContenar = () => {
           >
             <div
               className={`max-w-xs px-4 py-2 rounded-2xl shadow ${msg.sender_email === userEmail
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-gray-800"
+                ? "bg-blue-500 text-white"
+                : "bg-white text-gray-800"
                 }`}
             >
               {msg.message_text || msg.message}
@@ -103,11 +100,14 @@ const ChatContenar = () => {
           onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
         />
         <button
+          type="button"
+          className="btn btn-primary px-4 py-2 fw-semibold shadow-sm rounded-pill"
           onClick={handleSendMessage}
-          className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition"
         >
           Send
         </button>
+
+
       </div>
     </div>
   );

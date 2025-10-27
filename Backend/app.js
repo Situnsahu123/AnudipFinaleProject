@@ -7,6 +7,7 @@ const SignupRoute = require("./routes/SignupRoute");
 const LoginRoute = require("./routes/LoginRoute");
 const { verifyToken } = require("./services/JwtAuth");
 const ChatRoute = require("./routes/ChatRoute")
+const BlockRoute = require("./routes/BlockRoute");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));  
@@ -17,6 +18,7 @@ UserTable();
 app.use(SignupRoute);
 app.use(LoginRoute);
 app.use(ChatRoute);
+app.use("/block",BlockRoute);
 
 app.use((req, res, next) => {
   console.log(req.url, req.method);

@@ -5,17 +5,19 @@ import Signup from './Authentication/Signup'
 import Home from './Home'
 import ProtectedRoute from '../components/ProtectedRoute'
 import UpdatePassword from './Authentication/UpdatePassword'
+import BlockUser from '../components/BlockUser'
 
 const App = () => {
   return (
-  
+
     <Routes>
-        <Route path="/" element={<Navigate to="/home" replace />} />
+      <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgotpassword" element={<UpdatePassword />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/home" element={<Home />} />
+        <Route path="/block" element={<BlockUser />} />
       </Route>
     </Routes>
 
